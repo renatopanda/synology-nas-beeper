@@ -1,5 +1,5 @@
 # Disable UPS beeper (USB) in Synology NAS
-Small script to disable / enable the beeper sound from an USB connected UPS in Synology DiskStation Manager.
+Small script to disable / enable the beeper sound from a USB connected UPS in Synology DiskStation Manager.
 
 Based on [this post](https://moshib.in/2019/02/08/disable-ups-beeper-synology.html) from [Moshi's Blog](https://moshib.in).
 
