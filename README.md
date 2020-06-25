@@ -3,18 +3,18 @@ Small script to disable / enable the beeper sound from a USB connected UPS in Sy
 
 Based on [this post](https://moshib.in/2019/02/08/disable-ups-beeper-synology.html) from [Moshi's Blog](https://moshib.in).
 
-Some time ago the power went of at 4am for a long time and I had to get up and shutdown the UPS in order to stop the beeping. The abovementioned post describes how to disable it permanently. Still, I did not want to stop it from beeping during day time. The next steps and scripts are my solution to disable and enable the beeping during specific parts of the day (in my case between 00h and 09h).
+Some time ago the power went off at 4am for a long time and I had to get up and shutdown the UPS in order to stop the beeping. The abovementioned post describes how to disable it permanently. Still, I did not want it to stop beeping during day time. The next steps and scripts are my solution to disable and enable the beeping during specific parts of the day (in my case between 00h and 09h).
 
-**Important:** DSM updates seem to remove the scripts under /root/ and rollback the upsd.users file to its original state.
+**Important:** DSM updates seem to remove the scripts under /root/ and rollback the upsd.users file to its original state. If you update DSM you have to repeat the process.
 
 ## Intro
-In most Linux distros we have a set of tools to manage an UPS. Namely:
-* `upsc` - the ups client, which can be used to query details on the ups
-* `upsd` - the service /deamon
+In most Linux distros there is a set of tools to manage an UPS. Namely:
+* `upsc` - the ups client, which can be used to query details about the ups
+* `upsd` - the service / daemon
 * `upscmd` - command line tool used to send commands and change settings
 
 ### Some examples:
-List available upses:
+List available UPSes:
 ```shell
 user@nas:/$ upsc -l
 ups
@@ -51,7 +51,7 @@ Both `upsc` and `upscmd` communicate with the `upsd` using a client/server model
 ### 1. SSH into the NAS
 Activate SSHd under the synology control panel if you haven't done so and SSH into it. Note: under windows you might need a decent console with ssh (git bash?) or to use PuTTY.
 ```shell
-ssh <username>@ip -p port
+ssh <username>@<nas_ip> -p <ssh_port>
 ```
 
 ### 2. Add a new user to upsd
@@ -61,15 +61,15 @@ user@nas:/$ sudo vim /usr/syno/etc/ups/upsd.users
 Password: <insert your pwd>
 ```
 
-In case you are not used to the VIM editor be careful:
-* Move the cursor down <kbd>&#8595;</kbd> until you find the place where you want to add your new lines
+Be careful with the VIM editor! In case you are not familiar with it:
+* Move the cursor down <kbd>&#8595;</kbd> until you find the place where you want to add the new lines
 * Press <kbd>I</kbd> to enter the INSERT MODE
 * Edit the file as needed
 * Press the <kbd>Esc</kbd> Key to leave the edit mode
 * Press <kbd>:</kbd> to issue a command
 * Write "wq" (write an quit) and hit <kbd>Enter</kbd>
 
-To add a new file (replace `<upsd_username>` and `<upsd_pwd>` with the desired values:
+So, edit the upsd.users file and add a new user with privileges to enable/disable the beeper (replace `<upsd_username>` and `<upsd_pwd>` with the desired values):
 ```shell
     [<upsd_username>]
         password = <upsd_pwd>
@@ -88,7 +88,7 @@ synoservice --restart ups-usb
 sudo vim /root/upscmd.py
 ```
 
-The upscmd.py script:
+The upscmd.py script content:
 ```python
 #!/bin/python2
 import sys
@@ -124,7 +124,7 @@ print tn.read_all()
 ```
 
 ### 5. Create a bash script to call the script
-Could be skipped. Is used to call the `upscmd.py` script with "beeper.enable" or "beeper.disable" depending on the time of the day since I want to re-set it not only on specific times (via cron) but also when the NAS boots.
+Could be skipped or done in a single script. It is used to call the `upscmd.py` script with "beeper.enable" or "beeper.disable" depending on the time of the day since I want to re-set it not only on specific times (via cron) but also when the NAS boots.
 See ups_beeper_control.sh.
 
 ### 6. Make the scripts executable
