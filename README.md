@@ -74,7 +74,7 @@ So, edit the upsd.users file and add a new user with privileges to enable/disabl
     [<upsd_username>]
         password = <upsd_pwd>
         actions = SET
-        instcmds = beeper.enable beeper.disable
+        instcmds = beeper.enable beeper.disable ups.beeper.status
 ```
 
 ### 3. Restart the upsd service
@@ -121,6 +121,10 @@ print "INSTCMD cmd status: {0}".format(response.strip())
 
 tn.write("LOGOUT\n")
 print tn.read_all()
+```
+**Note**: You can just clone the repo to a folder in your NAS, edit the file to set the user/pwd and then copy this and the following `ups_beeper_control.sh` to the right place, e.g.:
+```shell
+sudo cp /volume<N>/<path_to_your_file>/upscmd.py /root/
 ```
 
 ### 5. Create a bash script to call the script
