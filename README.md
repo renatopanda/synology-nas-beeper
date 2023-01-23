@@ -53,11 +53,24 @@ Activate SSHd under the synology control panel if you haven't done so and SSH in
 ```shell
 ssh <username>@<nas_ip> -p <ssh_port>
 ```
+### 2. Find user configuration file
+The upsd.users file could be located in two places, find the needed one:
+```shell
+user@nas:/$ find /usr/syno/etc/ups/ /etc/ups/ -name "upsd.users"
+(result /path/to/upsd.users)
+```
 
-### 2. Add a new user to upsd
-Edit the upsd.users file and add a new user account with permissions to change the beeper status
+### 3. Add a new user to upsd
+Edit the upsd.users file (depending on file location according to the previous step) and add a new user account with permissions to change the beeper status
+
+For file inside _/usr/syno/etc/ups_
 ```shell
 user@nas:/$ sudo vim /usr/syno/etc/ups/upsd.users
+Password: <insert your pwd>
+```
+For file inside _/etc/ups_
+```shell
+user@nas:/$ sudo vim /etc/ups/upsd.users
 Password: <insert your pwd>
 ```
 
@@ -77,13 +90,13 @@ So, edit the upsd.users file and add a new user with privileges to enable/disabl
         instcmds = beeper.enable beeper.disable ups.beeper.status
 ```
 
-### 3. Restart the upsd service
+### 4. Restart the upsd service
 ```shell
 synoservice --restart ups-usb
 (wait a few seconds)
 ```
 
-### 4. Create a python script to issue commands
+### 5. Create a python script to issue commands
 ```shell
 sudo vim /root/upscmd.py
 ```
@@ -127,11 +140,11 @@ print tn.read_all()
 sudo cp /volume<N>/<path_to_your_file>/upscmd.py /root/
 ```
 
-### 5. Create a bash script to call the script
+### 6. Create a bash script to call the script
 Could be skipped or done in a single script. It is used to call the `upscmd.py` script with "beeper.enable" or "beeper.disable" depending on the time of the day since I want to re-set it not only on specific times (via cron) but also when the NAS boots.
 See ups_beeper_control.sh.
 
-### 6. Make the scripts executable
+### 7. Make the scripts executable
 ```shell
 sudo chmod u+x upscmd.py
 sudo chmod u+x ups_beeper_control.sh
@@ -164,7 +177,7 @@ Waiting 5 seconds for UPS to update state...
 Beeper enabled.
 ```
 
-### 6. Schedule it
+### 8. Schedule it
 Go to the DSM Web interface (Control panel -> Task scheduler) and add the 3 tasks:
 1. Scheduled task to enable beeper (daily)
     - user: root
